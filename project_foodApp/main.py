@@ -94,6 +94,7 @@ def main(page: ft.Page):
                     [
                         ft.AppBar(title=ft.Text("Home page"), bgcolor=ft.colors.SURFACE_VARIANT),
                         ft.Text("This is the home page")
+                        ft.Text("This is the home page")
                     ],
                 )
             )
