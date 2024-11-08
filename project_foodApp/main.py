@@ -26,6 +26,8 @@ def main(page: ft.Page):
         password.update()
         # If there isn't any problem, it goes to forms
         if not has_error:
+            username.value=""
+            password.value=""
             page.go("/homepage")
 
     # Function to validate the sign up form
@@ -48,7 +50,7 @@ def main(page: ft.Page):
             confirm_password.error_text="The password is required"
             has_error=True
         elif password.value != confirm_password.value:
-            confirm_password.error_text="The passwords don't match"
+            confirm_password.error_text="Passwords don't match"
             has_error=True
         else:
             confirm_password.error_text=None
@@ -57,6 +59,9 @@ def main(page: ft.Page):
         confirm_password.update()
         # If there isn't any problem, it goes to forms
         if not has_error:
+            username.value=""
+            password.value=""
+            confirm_password.value=""
             page.go("/homepage")
 
     def route_change(route):
@@ -93,7 +98,6 @@ def main(page: ft.Page):
                     "/homepage",
                     [
                         ft.AppBar(title=ft.Text("Home page"), bgcolor=ft.colors.SURFACE_VARIANT),
-                        ft.Text("This is the home page")
                         ft.Text("This is the home page")
                     ],
                 )
