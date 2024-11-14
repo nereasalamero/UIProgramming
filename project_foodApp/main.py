@@ -58,7 +58,6 @@ def main(page: ft.Page):
             signup_confirm_password.update()
             page.go("/homepage")
 
-    
     # Function to validate the sign in form
     def signin_validate(e):
         has_error = False
@@ -84,8 +83,8 @@ def main(page: ft.Page):
             signin_password.update()
             page.go("/homepage")
 
-    
 
+    # Function to change the navigation route
     def route_change(route):
         page.views.clear()
         page.views.append(
@@ -128,6 +127,7 @@ def main(page: ft.Page):
             )
         page.update()
     
+    # Function to go back to the previous view
     def view_pop(view):
         page.views.pop()
         top_view = page.views[-1]
