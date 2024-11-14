@@ -2,67 +2,89 @@ import flet as ft
 
 # This is the main function that will be executed when the app starts
 def main(page: ft.Page):
-    # Variables used in the app
-    username = ft.TextField(label="Username")
-    password = ft.TextField(label="Password", password=True, can_reveal_password=True)
-    confirm_password = ft.TextField(label="Confirm password", password=True, can_reveal_password=True)
+    # Variables used in the authentication pages
+    signup_username = ft.TextField(label="Username")
+    signup_password = ft.TextField(label="Password", password=True, can_reveal_password=True)
+    signup_confirm_password = ft.TextField(label="Confirm password", password=True, can_reveal_password=True)
+    signin_username = ft.TextField(label="Username")
+    signin_password = ft.TextField(label="Password", password=True, can_reveal_password=True)
 
-    # Function to validate the sign in form
-    def validate_form_SI(e):
-        has_error = False
-        # Check username
-        if not username.value:
-            username.error_text="The username is required"
-            has_error=True
-        else:
-            username.error_text=None
-        # Check password
-        if not password.value:
-            password.error_text="The password is required"
-            has_error=True
-        else:
-            password.error_text=None
-        username.update()
-        password.update()
-        # If there isn't any problem, it goes to forms
-        if not has_error:
-            username.value=""
-            password.value=""
-            page.go("/homepage")
+    # Variables used in the main page
+
+
+    # Variables used in the profile pages
+
+
+    # Variables used in the restaurant page
+
+
+    # Variables used in the basket page
+
 
     # Function to validate the sign up form
-    def validate_form_SU(e):
+    def signup_validate(e):
         has_error = False
         # Check username
-        if not username.value:
-            username.error_text="The username is required"
+        if not signup_username.value:
+            signup_username.error_text="The username is required"
             has_error=True
         else:
-            username.error_text=None
+            signup_username.error_text=None
         # Check password
-        if not password.value:
-            password.error_text="The password is required"
+        if not signup_password.value:
+            signup_password.error_text="The password is required"
             has_error=True
         else:
-            password.error_text=None
+            signup_password.error_text=None
         # Check confirm password
-        if not confirm_password.value:
-            confirm_password.error_text="The password is required"
+        if not signup_confirm_password.value:
+            signup_confirm_password.error_text="The password is required"
             has_error=True
-        elif password.value != confirm_password.value:
-            confirm_password.error_text="Passwords don't match"
+        elif signup_password.value != signup_confirm_password.value:
+            signup_confirm_password.error_text="Passwords don't match"
             has_error=True
         else:
-            confirm_password.error_text=None
-        username.update()
-        password.update()
-        confirm_password.update()
+            signup_confirm_password.error_text=None
+        signup_username.update()
+        signup_password.update()
+        signup_confirm_password.update()
         # If there isn't any problem, it goes to forms
         if not has_error:
-            username.value=""
-            password.value=""
-            confirm_password.value=""
+            signup_username.value=""
+            signup_password.value=""
+            signup_confirm_password.value=""
+            signup_username.update()
+            signup_password.update()
+            signup_confirm_password.update()
             page.go("/homepage")
+
+    
+    # Function to validate the sign in form
+    def signin_validate(e):
+        has_error = False
+        # Check username
+        if not signin_username.value:
+            signin_username.error_text="The username is required"
+            has_error=True
+        else:
+            signin_username.error_text=None
+        # Check password
+        if not signin_password.value:
+            signin_password.error_text="The password is required"
+            has_error=True
+        else:
+            signin_password.error_text=None
+        signin_username.update()
+        signin_password.update()
+        # If there isn't any problem, it goes to forms
+        if not has_error:
+            signin_username.value=""
+            signin_password.value=""
+            signin_username.update()
+            signin_password.update()
+            page.go("/homepage")
+
+    
 
     def route_change(route):
         page.views.clear()
@@ -71,9 +93,9 @@ def main(page: ft.Page):
                 "/",
                 [
                     ft.AppBar(title=ft.Text("Sign in"), bgcolor=ft.colors.SURFACE_VARIANT),
-                    username,
-                    password,
-                    ft.ElevatedButton("Sign in", on_click=validate_form_SI),
+                    signin_username,
+                    signin_password,
+                    ft.ElevatedButton("Sign in", on_click=signin_validate),
                     ft.ElevatedButton("I don't have an account", on_click=lambda _: page.go("/signup")),                    
                 ],
             )
@@ -84,11 +106,13 @@ def main(page: ft.Page):
                     "/signup",
                     [
                         ft.AppBar(title=ft.Text("Sign up"), bgcolor=ft.colors.SURFACE_VARIANT),
-                        username,
-                        password,
-                        confirm_password,
-                        ft.ElevatedButton("Sign up", on_click=validate_form_SU),
-                        ft.ElevatedButton("I already have an account", on_click=lambda _: page.go("/")),
+                        signup_username,
+                        signup_password,
+                        signup_confirm_password,
+                        ft.Column(controls=[
+                            ft.ElevatedButton("Sign up", on_click=signup_validate),
+                            ft.ElevatedButton("I already have an account", on_click=lambda _: page.go("/"))],
+                            alignment=ft.MainAxisAlignment.CENTER),
                     ],
                 )
             )
