@@ -132,7 +132,7 @@ def main(page: ft.Page):
                     signin_username,
                     signin_password,
                     ft.ElevatedButton("Sign in", on_click=signin_validate),
-                    ft.ElevatedButton("I don't have an account", on_click=lambda _: page.go("/signup")),                    
+                    ft.ElevatedButton("I don't have an account", on_click=lambda _: page.go("/signup")),                
                 ],
             )
         )
@@ -158,7 +158,8 @@ def main(page: ft.Page):
                     "/homepage",
                     [
                         ft.AppBar(title=ft.Text("Home page"), bgcolor=ft.colors.SURFACE_VARIANT),
-                        ft.Text("This is the home page")
+                        ft.Text("This is the home page"),
+                        ft.ElevatedButton("Hesburger", on_click=lambda _: page.go("/hesburger")),
                     ],
                 )
             )
@@ -170,8 +171,8 @@ def main(page: ft.Page):
                         ft.AppBar(title=ft.Text("Hesburger"), bgcolor=ft.colors.SURFACE_VARIANT),
                         ft.Text("This is the Hesburger page"),
                         ft.Placeholder(
-                            label="foodpicture",
-                            expand=True,
+                            width=10,
+                            height= 10,
                             color=ft.colors.random_color()
                         ),
                         ft.ElevatedButton("Back", on_click=lambda _: page.on_view_pop()),
