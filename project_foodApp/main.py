@@ -9,10 +9,18 @@ def main(page: ft.Page):
     signin_username = ft.TextField(label="Username")
     signin_password = ft.TextField(label="Password", password=True, can_reveal_password=True)
 
+    # Variables used in the profile pages
+    profile_name = ft.TextField(label="Name")
+    profile_email = ft.TextField(label="Email")
+    profile_phone = ft.TextField(label="Phone")
+    profile_address = ft.TextField(label="Address")
+    profile_username = ft.TextField(label="Username")
+    profile_password = ft.TextField(label="Password", password=True, can_reveal_password=True)
+
+
     # Variables used in the main page
 
 
-    # Variables used in the profile pages
 
 
     # Variables used in the restaurant page
@@ -48,6 +56,7 @@ def main(page: ft.Page):
         signup_username.update()
         signup_password.update()
         signup_confirm_password.update()
+        profile_username=signup_username.value
         # If there isn't any problem, it goes to forms
         if not has_error:
             signup_username.value=""
@@ -58,7 +67,6 @@ def main(page: ft.Page):
             signup_confirm_password.update()
             page.go("/homepage")
 
-    
     # Function to validate the sign in form
     def signin_validate(e):
         has_error = False
@@ -84,8 +92,8 @@ def main(page: ft.Page):
             signin_password.update()
             page.go("/homepage")
 
-    
 
+    # Function to change the navigation route
     def route_change(route):
         page.views.clear()
         page.views.append(
@@ -122,12 +130,13 @@ def main(page: ft.Page):
                     "/homepage",
                     [
                         ft.AppBar(title=ft.Text("Home page"), bgcolor=ft.colors.SURFACE_VARIANT),
-                        ft.Text("This is the home page")
+                        ft.Text("This is the home page"),
                     ],
                 )
             )
         page.update()
     
+    # Function to go back to the previous view
     def view_pop(view):
         page.views.pop()
         top_view = page.views[-1]
