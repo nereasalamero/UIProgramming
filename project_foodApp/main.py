@@ -2,6 +2,14 @@ import flet as ft
 
 # This is the main function that will be executed when the app starts
 def main(page: ft.Page):
+    # Variables used in the app
+    icon = ft.Image(
+        src=f"/assets/icon.png",
+        width=100,
+        height=100,
+        fit=ft.ImageFit.CONTAIN,
+    )
+
     # Variables used in the authentication pages
     signup_username = ft.TextField(label="Username")
     signup_password = ft.TextField(label="Password", password=True, can_reveal_password=True)
@@ -114,9 +122,12 @@ def main(page: ft.Page):
                     "/signup",
                     [
                         ft.AppBar(title=ft.Text("Sign up"), bgcolor=ft.colors.SURFACE_VARIANT),
-                        signup_username,
-                        signup_password,
-                        signup_confirm_password,
+                        ft.Column(controls=[icon], alignment=ft.MainAxisAlignment.CENTER),
+                        ft.Column([
+                            signup_username,
+                            signup_password,
+                            signup_confirm_password,],
+                            alignment=ft.MainAxisAlignment.CENTER),
                         ft.Column(controls=[
                             ft.ElevatedButton("Sign up", on_click=signup_validate),
                             ft.ElevatedButton("I already have an account", on_click=lambda _: page.go("/"))],
