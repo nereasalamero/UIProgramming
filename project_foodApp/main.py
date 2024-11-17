@@ -160,6 +160,7 @@ def main(page: ft.Page):
                         ft.AppBar(title=ft.Text("Home page"), bgcolor=ft.colors.SURFACE_VARIANT),
                         ft.Text("This is the home page"),
                         ft.ElevatedButton("Hesburger", on_click=lambda _: page.go("/hesburger")),
+                        # create this button to go to restaurant chooser function that will then append different values depending on restaurant
                     ],
                 )
             )
@@ -168,14 +169,61 @@ def main(page: ft.Page):
                 ft.View(
                     "/hesburger",
                     [
-                        ft.AppBar(title=ft.Text("Hesburger"), bgcolor=ft.colors.SURFACE_VARIANT),
-                        ft.Text("This is the Hesburger page"),
-                        ft.Placeholder(
-                            width=10,
-                            height= 10,
-                            color=ft.colors.random_color()
+                        ft.AppBar(title=ft.Text("Hesburger", size=25), bgcolor=ft.colors.SURFACE_VARIANT),
+                        ft.Row(
+                            controls=[
+                                ft.Container(
+                                    content=ft.Image(src="https://upload.wikimedia.org/wikipedia/en/thumb/c/cb/Hesburger_Logo.svg/1200px-Hesburger_Logo.svg.png"),
+                                    width=150,
+                                    height=150,
+                                    border_radius=ft.border_radius.all(10),
+                                    bgcolor=ft.colors.WHITE,
+                                    padding=ft.padding.all(10),
+                                ),
+                                ft.Column(
+                                    controls=[
+                                        ft.Text("Hesburger", size=25, weight=ft.FontWeight.BOLD),
+                                        ft.Row(
+                                            controls=[
+                                                ft.Icon(name=ft.icons.STAR, color=ft.colors.AMBER_500, size=15),
+                                                ft.Icon(name=ft.icons.STAR, color=ft.colors.AMBER_500, size=15),
+                                                ft.Icon(name=ft.icons.STAR, color=ft.colors.AMBER_500, size=15),
+                                                ft.Icon(name=ft.icons.STAR, color=ft.colors.AMBER_500, size=15),
+                                                ft.Icon(name=ft.icons.STAR_BORDER, color=ft.colors.AMBER_500, size=15),
+                                            ],
+                                            alignment=ft.MainAxisAlignment.CENTER,
+                                        ),
+                                        ft.Text("Burgers, Fast Food", size=15),
+                                    ],
+                                    alignment=ft.MainAxisAlignment.CENTER,
+                                ),
+                            ],
+                            alignment=ft.MainAxisAlignment.CENTER,
                         ),
-                        ft.ElevatedButton("Back", on_click=lambda _: page.on_view_pop()),
+                        ft.Divider(height=20),
+                        ft.Row(
+                            controls=[
+                                ft.Container(
+                                    content=ft.Text("Menu"),
+                                    width=150,
+                                    height=50,
+                                    bgcolor=ft.colors.SURFACE_VARIANT,
+                                    padding=ft.padding.all(10),
+                                    alignment=ft.alignment.center,  # Ensure this is a valid alignment value
+                                    border_radius=ft.border_radius.all(10),
+                                ),
+                                # ft.Container(
+                                #     content=ft.Text("Reviews"),
+                                #     width=150,
+                                #     height=50,
+                                #     bgcolor=ft.colors.SURFACE_VARIANT,
+                                #     padding=ft.padding.all(10),
+                                #     alignment=ft.alignment.center,  # Ensure this is a valid alignment value
+                                #     border_radius=ft.border_radius.all(10),
+                                # ),
+                            ],
+                            alignment=ft.MainAxisAlignment.CENTER,
+                        ),
                     ],
                 )
             )
