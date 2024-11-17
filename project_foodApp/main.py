@@ -53,8 +53,49 @@ def main(page: ft.Page):
 
 
     # Variables used in the restaurant page
+    hesburger = Restaurant(
+        type_of_food="Fast food",
+        menu={
+            "Hesburger": 5, 
+            "Cheeseburger": 6,
+            "Fries": 3},
+        location="Helsinki",
+        rating=4.5
+    )
+    hes_quantities = {item: 0 for item in hesburger.menu}
 
+    # counter function to add items to basket
+    def update_total():
+        total_quantity = sum(hes_quantities.values())
+        total_price = sum(hes_quantities[item] * price for item, price in hesburger.menu.items())
+        total_quantity_text.value = f"Total Quantity: {total_quantity}"
+        total_price_text.value = f"Total Price: ${total_price:.2f}"
+        page.update()
+    def increment_quantity(item):
+        hes_quantities[item] += 1
+        update_total()
+    menu_controls = []
+    menu_controls = []
+    for item, price in hesburger.menu.items():
+        menu_controls.append(
+            ft.Row(
+                controls=[
+                    ft.Text(f"{item} - ${price:.2f}"),
+                    ft.IconButton(ft.icons.REMOVE, on_click=lambda e, item=item: decrement_quantity(item)),
+                    ft.Text(f"{hes_quantities[item]}"),
+                    ft.IconButton(ft.icons.ADD, on_click=lambda e, item=item: increment_quantity(item)),
+                ],
+                alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                width=300,
+            )
+        )
+    total_quantity_text = ft.Text("Total Quantity: 0")
+    total_price_text = ft.Text("Total Cost: $0.00")
 
+    def decrement_quantity(item):
+        if hes_quantities[item] > 0:
+            hes_quantities[item] -= 1
+        update_total()
     # Variables used in the basket page
 
 
@@ -173,7 +214,7 @@ def main(page: ft.Page):
                         ft.Row(
                             controls=[
                                 ft.Container(
-                                    content=ft.Image(src="https://upload.wikimedia.org/wikipedia/en/thumb/c/cb/Hesburger_Logo.svg/1200px-Hesburger_Logo.svg.png"),
+                                    content=ft.Image(src=" "),
                                     width=150,
                                     height=150,
                                     border_radius=ft.border_radius.all(10),
@@ -201,10 +242,11 @@ def main(page: ft.Page):
                             alignment=ft.MainAxisAlignment.CENTER,
                         ),
                         ft.Divider(height=20),
-                        ft.Row(
+                        ft.Column(
                             controls=[
                                 ft.Container(
-                                    content=ft.Text("Menu"),
+                                    content=
+                                    ft.Text("Menu"),
                                     width=150,
                                     height=50,
                                     bgcolor=ft.colors.SURFACE_VARIANT,
@@ -212,15 +254,41 @@ def main(page: ft.Page):
                                     alignment=ft.alignment.center,  # Ensure this is a valid alignment value
                                     border_radius=ft.border_radius.all(10),
                                 ),
-                                # ft.Container(
-                                #     content=ft.Text("Reviews"),
-                                #     width=150,
-                                #     height=50,
-                                #     bgcolor=ft.colors.SURFACE_VARIANT,
-                                #     padding=ft.padding.all(10),
-                                #     alignment=ft.alignment.center,  # Ensure this is a valid alignment value
-                                #     border_radius=ft.border_radius.all(10),
+                                ft.Container(
+                                    content=
+                                    ft.Column(
+                                        controls=menu_controls,
+                                        alignment=ft.MainAxisAlignment.CENTER,
+                                    ),
+                                ),    
+                                # ft.Column(
+                                #     controls=[
+                                #         ft.Column(
+                                #             controls=[
+                                #                 ft.Row(
+                                #                     controls=[
+                                #                         ft.Text(item, size=20),
+                                #                         ft.Text(f"{hes_quantities[item]} x {price:.2f} ", size=20),
+                                #                     ],
+                                #                     alignment=ft.MainAxisAlignment.END,
+                                #                 ) for item, price in hesburger.menu.items()
+                                #             ],
+                                #             alignment=ft.MainAxisAlignment.END,
+                                #         ),
+                                #         total_quantity_text,
+                                #         total_price_text,
+                                #     ],
+                                #     alignment=ft.MainAxisAlignment.CENTER,
                                 # ),
+                                ft.Container(
+                                    content=ft.Text("Reviews"),
+                                    width=150,
+                                    height=50,
+                                    bgcolor=ft.colors.SURFACE_VARIANT,
+                                    padding=ft.padding.all(10),
+                                    alignment=ft.alignment.center,  # Ensure this is a valid alignment value
+                                    border_radius=ft.border_radius.all(10),
+                                ),
                             ],
                             alignment=ft.MainAxisAlignment.CENTER,
                         ),
