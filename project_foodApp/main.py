@@ -10,10 +10,10 @@ def main(page: ft.Page):
     signin_password = ft.TextField(label="Password", password=True, can_reveal_password=True)
 
     # Variables for the homepage
-    basket = ft.IconButton(ft.icons.SHOPPING_BASKET)
-    profile = ft.IconButton(ft.icons.ACCOUNT_CIRCLE)
+    basket = ft.IconButton(ft.icons.SHOPPING_BASKET, on_click=lambda _: page.go("/basket"))
+    profile = ft.IconButton(ft.icons.ACCOUNT_CIRCLE, on_click=lambda _: page.go("/profile"))
     leading_avatar = ft.CircleAvatar(
-        foreground_image_url="",
+        foreground_image_url="", #Still don't know how to specify the path for the icon in the code ahahaha
         radius=20,
     )
 
@@ -24,7 +24,7 @@ def main(page: ft.Page):
         {"name": "Taco Bell", "category": "Tacos", "image": "https://via.placeholder.com/300x150"},
     ]
 
-    # Liste affichant les restaurants
+    # List showing the restaurants
     restaurant_list = ft.Column(spacing=10)
 
     # Function to filter restaurants
@@ -129,7 +129,7 @@ def main(page: ft.Page):
             ft.View(
                 "/",
                 [
-                    ft.AppBar(title=ft.Text("Sign in"), bgcolor=ft.colors.LIGHT_GREEN_ACCENT_100),
+                    ft.AppBar(title=ft.Text("Sign in"), bgcolor=ft.colors.LIGHT_GREEN_ACCENT_100, center_title=True),
                     ft.Container(
                         content=ft.Column(
                             controls=[
@@ -201,6 +201,37 @@ def main(page: ft.Page):
             )
             # Show all restaurants by default
             filter_restaurants("All")
+            
+        elif page.route == "/basket":
+            page.views.append(
+            ft.View(
+                "/basket",
+                [
+                ft.AppBar(title=ft.Text("Basket"), bgcolor=ft.colors.LIGHT_GREEN_ACCENT_100, center_title=True),
+                ft.Container(
+                    content=ft.Text("This is the basket page", size=20),
+                    expand=True,
+                    alignment=ft.alignment.center,
+                    ),
+                ],
+            )
+        )
+        
+        elif page.route == "/profile":
+            page.views.append(
+        ft.View(
+            "/profile",
+            [
+                ft.AppBar(title=ft.Text("Profile"), bgcolor=ft.colors.LIGHT_GREEN_ACCENT_100, center_title=True),
+                ft.Container(
+                    content=ft.Text("This is my profile page", size=20),
+                    expand=True,
+                    alignment=ft.alignment.center,
+                ),
+            ],
+        )
+    )
+            
         page.update()
 
     # Function to go back to the previous view
