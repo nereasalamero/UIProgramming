@@ -25,6 +25,7 @@ def main(page: ft.Page):
     profile_address = ft.TextField(label="Address")
     profile_username = ft.TextField(label="Username")
     profile_password = ft.TextField(label="Password", password=True, can_reveal_password=True)
+    dark_mode = ft.Switch(label="Dark mode", value=False)
 
     # Variables for the homepage
     basket = ft.IconButton(ft.icons.SHOPPING_BASKET, on_click=lambda _: page.go("/basket"))
@@ -250,11 +251,57 @@ def main(page: ft.Page):
                 ft.View(
                     "/profile",
                     [
+                        ft.AppBar(
+                            leading=leading_avatar,
+                            leading_width=40,
+                            title=ft.Text("Profile"),
+                            bgcolor=background_color,
+                            center_title=True,
+                            actions=[basket, profile],
+                        ),
+                        ft.Container(
+                            content=ft.Column(
+                                controls=[
+                                    ft.Text("This is my profile page", size=20),
+                                    ft.Text(f"Username: {profile_username.value}", size=15),
+                                    ft.Text(f"Name: {profile_name.value}", size=15),
+                                    ft.Text(f"Email: {profile_email.value}", size=15),
+                                    ft.Text(f"Phone: {profile_phone.value}", size=15),
+                                    ft.Text(f"Address: {profile_address.value}", size=15),
+                                    ft.Text(f"Dark mode: {dark_mode.value}", size=15),
+                                    ft.ElevatedButton("Edit profile", on_click=lambda _: page.go("/editprofile")),
+                                ],
+                                alignment=ft.MainAxisAlignment.START, 
+                                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                            ),
+                            expand=True,
+                        ),
+                    ],
+                )
+            )
+        elif page.route == "/editprofile":
+            page.views.append(
+                ft.View(
+                    "/editprofile",
+                    [
                         ft.AppBar(title=ft.Text("Profile"), bgcolor=background_color, center_title=True),
                         ft.Container(
-                            content=ft.Text("This is my profile page", size=20),
+                            content=ft.Column(
+                                controls=[
+                                    ft.Text("This is my profile page", size=20),
+                                    profile_username,
+                                    profile_name,
+                                    profile_email,
+                                    profile_phone,
+                                    profile_address,
+                                    profile_password,
+                                    dark_mode,
+                                    ft.ElevatedButton("Save changes", on_click=lambda _: page.go("/profile")),
+                                ],
+                                alignment=ft.MainAxisAlignment.START, 
+                                horizontal_alignment=ft.CrossAxisAlignment.START,
+                            ),
                             expand=True,
-                            alignment=ft.alignment.center,
                         ),
                     ],
                 )
