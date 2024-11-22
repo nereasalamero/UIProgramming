@@ -111,16 +111,16 @@ def main(page: ft.Page):
     #     #on_click=lambda _: page.go("/homepage"),
     # )
     leading_avatar = ft.Image(
-        src="/assets/icon.png",
+        src="https://raw.githubusercontent.com/nereasalamero/UIProgramming/main/project_foodApp/assets/icon.png",
         width=30,
         height=30,
     )
 
     # Data for the three restaurants
     restaurants = [
-        {"name": "Hesburger", "category": "Burger", "image": "/assets/hesburger.png", "page": "/hesburger"},
-        {"name": "Subway", "category": "Sandwich", "image": "/assets/subway.png", "page": "/subway"},
-        {"name": "Taco Bell", "category": "Tacos", "image": "/assets/tacobell.png", "page": "/tacobell"},
+    {"name": "Hesburger", "category": "Burger", "image": "https://raw.githubusercontent.com/nereasalamero/UIProgramming/main/project_foodApp/assets/hesburger.png", "page": "hesburger"},
+    {"name": "Subway", "category": "Sandwich", "image": "https://raw.githubusercontent.com/nereasalamero/UIProgramming/main/project_foodApp/assets/subway.png", "page": "subway"},
+    {"name": "Taco Bell", "category": "Tacos", "image": "https://raw.githubusercontent.com/nereasalamero/UIProgramming/main/project_foodApp/assets/tacobell.png", "page": "tacobell"},
     ]
 
     # List showing the restaurants
@@ -179,19 +179,22 @@ def main(page: ft.Page):
         page.update()
 
     # Function to create restaurant container
-    def create_restaurant_container(name, image_url, page_name):
+    def create_restaurant_container(name, image_url, restaurant_app):
         return ft.Container(
-            content=ft.Text(name, color=ft.colors.WHITE, size=20, weight=ft.FontWeight.BOLD),
-            expand=True,
-            bgcolor=background_color,
-            padding=20,
-            border_radius=10,
+            content=ft.Column(
+                controls=[
+                ft.Image(src=image_url, width=100, height=100, fit=ft.ImageFit.COVER),  # Image here
+                ft.Text(name, color=ft.colors.WHITE, size=20, weight=ft.FontWeight.BOLD),  # Text below
+                ],
             alignment=ft.alignment.center,
-            image_src=image_url,
-            image_fit=ft.ImageFit.COVER,
-            height=150,
-            on_click=lambda _: page.go(f"{page_name}"),
-        )
+            horizontal_alignment=ft.CrossAxisAlignment.CENTER
+        ),
+        expand=True,
+        bgcolor=background_color,
+        padding=20,
+        border_radius=10,
+        on_click=lambda _: page.go(f"/{restaurant_app.restaurant.type_of_food.lower()}"),  # Change to restaurant type or ID
+    )
 
     # Function to validate the sign-up form
     def signup_validate(e):
