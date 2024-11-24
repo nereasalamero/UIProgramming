@@ -82,6 +82,7 @@ def main(page: ft.Page):
     signup_username = ft.TextField(label="Username")
     signup_password = ft.TextField(label="Password", password=True, can_reveal_password=True)
     signup_confirm_password = ft.TextField(label="Confirm password", password=True, can_reveal_password=True)
+
     signin_username = ft.TextField(label="Username")
     signin_password = ft.TextField(label="Password", password=True, can_reveal_password=True)
 
@@ -105,11 +106,6 @@ def main(page: ft.Page):
     basket = ft.IconButton(ft.icons.SHOPPING_BASKET, on_click=lambda _: page.go("/basket"))
     profile = ft.IconButton(ft.icons.ACCOUNT_CIRCLE, on_click=lambda _: page.go("/profile"))
     home = ft.IconButton(ft.icons.HOME, on_click=lambda _: page.go("/homepage"))
-    # leading_avatar = ft.CircleAvatar(
-    #     foreground_image_src=icon,
-    #     radius=20,
-    #     #on_click=lambda _: page.go("/homepage"),
-    # )
     leading_avatar = ft.Image(
         src="https://raw.githubusercontent.com/nereasalamero/UIProgramming/main/project_foodApp/assets/icon.png",
         width=30,
@@ -179,22 +175,23 @@ def main(page: ft.Page):
         page.update()
 
     # Function to create restaurant container
-    def create_restaurant_container(name, image_url, restaurant_app):
+    def create_restaurant_container(name, image_url, link):
         return ft.Container(
             content=ft.Column(
                 controls=[
-                ft.Image(src=image_url, width=100, height=100, fit=ft.ImageFit.COVER),  # Image here
-                ft.Text(name, color=ft.colors.WHITE, size=20, weight=ft.FontWeight.BOLD),  # Text below
+                    ft.Image(src=image_url, width=page.width, height=100, fit=ft.ImageFit.COVER, expand=True),  # Image here
+                    ft.Text(name, color=ft.colors.BLACK, size=20, weight=ft.FontWeight.BOLD),  # Text below
                 ],
-            alignment=ft.alignment.center,
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER
-        ),
-        expand=True,
-        bgcolor=background_color,
-        padding=20,
-        border_radius=10,
-        on_click=lambda _: page.go(f"/{restaurant_app.restaurant.type_of_food.lower()}"),  # Change to restaurant type or ID
-    )
+                alignment=ft.MainAxisAlignment.CENTER,
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                expand=True,
+            ),
+            expand=True,
+            bgcolor=background_color,
+            padding=20,
+            border_radius=10,
+            on_click=lambda _: page.go(f"/{link}"),  # Change to restaurant type or ID
+        )
 
     # Function to validate the sign-up form
     def signup_validate(e):
@@ -266,6 +263,86 @@ def main(page: ft.Page):
 
             # Navigate to the homepage
             page.go("/homepage")
+    
+    #Function to add a new restaurant page
+    def restaurant_page(page, route, name, image_src, type_of_food, location, total_quantity_text, total_price_text, menu_controls, rating):
+        return ft.View(
+            route,
+            [
+                ft.AppBar(
+                    leading=leading_avatar,
+                    leading_width=40,
+                    bgcolor=background_color,
+                    center_title=True,
+                    actions=[home, basket, profile],
+                ),
+                ft.Row(
+                    controls=[
+                        ft.Container(
+                            content=ft.Image(src=image_src),  # Imagen del restaurante
+                            width=150,
+                            height=150,
+                            border_radius=ft.border_radius.all(10),
+                            bgcolor=ft.colors.WHITE,
+                            padding=ft.padding.all(10),
+                        ),
+                        ft.Column(
+                            controls=[
+                                ft.Text(name, size=25, weight=ft.FontWeight.BOLD),  # Restaurant name
+                                print_stars(rating),            # Stars
+                                ft.Text(type_of_food, size=15), # Type of food
+                                ft.Text(location, size=15),     # Location
+                                total_quantity_text,            # Total quantity
+                                total_price_text                # Total price
+                            ],
+                            alignment=ft.MainAxisAlignment.CENTER,
+                        ),
+                    ],
+                    alignment=ft.MainAxisAlignment.CENTER,
+                ),
+                ft.Divider(height=20),
+                ft.Column(
+                    controls=[
+                        ft.Container(
+                            content=ft.Text("Menu"),
+                            width=150,
+                            height=50,
+                            bgcolor=ft.colors.SURFACE_VARIANT,
+                            padding=ft.padding.all(10),
+                            alignment=ft.alignment.center,
+                            border_radius=ft.border_radius.all(10),
+                        ),
+                        ft.Container(
+                            content=ft.Column(
+                                controls=menu_controls,
+                                alignment=ft.MainAxisAlignment.CENTER,
+                            ),
+                        ),
+                        ft.Row(
+                            controls=[
+                                ft.ElevatedButton("Keep shopping", on_click=lambda _: page.go("/homepage")),
+                                ft.ElevatedButton("Go to basket", on_click=lambda _: page.go("/basket")),
+                            ],
+                            alignment=ft.MainAxisAlignment.CENTER,
+                        )
+                    ],
+                    alignment=ft.MainAxisAlignment.CENTER,
+                ),
+            ],
+        )
+
+    #Function to automatize the stars
+    def print_stars(rating):
+        stars = []
+        full_stars = int(rating)
+        half_star = rating - full_stars >= 0.5
+        for _ in range(full_stars):
+            stars.append(ft.Icon(name=ft.icons.STAR, color=ft.colors.AMBER_500, size=15))
+        if half_star:
+            stars.append(ft.Icon(name=ft.icons.STAR_HALF, color=ft.colors.AMBER_500, size=15))
+        for _ in range(5 - len(stars)):
+            stars.append(ft.Icon(name=ft.icons.STAR_BORDER, color=ft.colors.AMBER_500, size=15))
+        return ft.Row(controls=stars, alignment=ft.MainAxisAlignment.CENTER)
 
     # Function to change the navigation route
     def route_change(route):
@@ -340,7 +417,7 @@ def main(page: ft.Page):
                             alignment=ft.MainAxisAlignment.CENTER,
                         ),
                         ft.Container(
-                            content=restaurant_list, expand=True
+                            content=restaurant_list, expand=True, alignment=ft.alignment.center,
                         ),
                     ],
                 )
@@ -352,18 +429,18 @@ def main(page: ft.Page):
             ft.View(
                 "/basket",
                 [
-                ft.AppBar(
-                            leading=leading_avatar,
-                            leading_width=40,
-                            title=ft.Text("Basket"),
-                            bgcolor=background_color,
-                            center_title=True,
-                            actions=[home, profile],
-                        ),
-                ft.Container(
-                    content=ft.Text("This is the basket page", size=20),
-                    expand=True,
-                    alignment=ft.alignment.center,
+                    ft.AppBar(
+                        leading=leading_avatar,
+                        leading_width=40,
+                        title=ft.Text("Basket"),
+                        bgcolor=background_color,
+                        center_title=True,
+                        actions=[home, profile],
+                    ),
+                    ft.Container(
+                        content=ft.Text("This is the basket page", size=20),
+                        expand=True,
+                        alignment=ft.alignment.center,
                     ),
                 ],
             )
@@ -379,7 +456,7 @@ def main(page: ft.Page):
                             title=ft.Text("Profile"),
                             bgcolor=background_color,
                             center_title=True,
-                            actions=[home, basket, profile],
+                            actions=[home, basket],
                         ),
                         ft.Container(
                             content=ft.Column(  
@@ -437,237 +514,47 @@ def main(page: ft.Page):
             )
         if page.route == "/hesburger":
             page.views.append(
-                ft.View(
+                restaurant_page(
+                    page,
                     "/hesburger",
-                    [
-                        ft.AppBar(
-                            leading=leading_avatar,
-                            leading_width=40,
-                            bgcolor=background_color,
-                            center_title=True,
-                            actions=[home, basket, profile],
-                        ),
-                        ft.Row(
-                            controls=[
-                                ft.Container(
-                                    content=ft.Image(src=" "),
-                                    width=150,
-                                    height=150,
-                                    border_radius=ft.border_radius.all(10),
-                                    bgcolor=ft.colors.WHITE,
-                                    padding=ft.padding.all(10),
-                                ),
-                                ft.Column(
-                                    controls=[
-                                        ft.Text("Hesburger", size=25, weight=ft.FontWeight.BOLD),
-                                        ft.Row(
-                                            controls=[
-                                                ft.Icon(name=ft.icons.STAR, color=ft.colors.AMBER_500, size=15),
-                                                ft.Icon(name=ft.icons.STAR, color=ft.colors.AMBER_500, size=15),
-                                                ft.Icon(name=ft.icons.STAR, color=ft.colors.AMBER_500, size=15),
-                                                ft.Icon(name=ft.icons.STAR, color=ft.colors.AMBER_500, size=15),
-                                                ft.Icon(name=ft.icons.STAR_BORDER, color=ft.colors.AMBER_500, size=15),
-                                            ],
-                                            alignment=ft.MainAxisAlignment.CENTER,
-                                        ),
-                                        ft.Text(hesburger.type_of_food, size=15),
-                                        ft.Text(hesburger.location, size=15),
-                                        hes.total_quantity_text,
-                                        hes.total_price_text
-                                    ],
-                                    alignment=ft.MainAxisAlignment.CENTER,
-                                ),
-                            ],
-                            alignment=ft.MainAxisAlignment.CENTER,
-                        ),
-                        ft.Divider(height=20),
-                        ft.Column(
-                            controls=[
-                                ft.Container(
-                                    content=
-                                    ft.Text("Menu"),
-                                    width=150,
-                                    height=50,
-                                    bgcolor=ft.colors.SURFACE_VARIANT,
-                                    padding=ft.padding.all(10),
-                                    alignment=ft.alignment.center,  # Ensure this is a valid alignment value
-                                    border_radius=ft.border_radius.all(10),
-                                ),
-                                ft.Container(
-                                    content=
-                                    ft.Column(
-                                        controls=hes.menu_controls,
-                                        alignment=ft.MainAxisAlignment.CENTER,
-                                    ),
-                                ),    
-                                # ft.Column(
-                                #     controls=[
-                                #         ft.Column(
-                                #             controls=[
-                                #                 ft.Row(
-                                #                     controls=[
-                                #                         ft.Text(item, size=20),
-                                #                         ft.Text(f"{hes_quantities[item]} x {price:.2f} ", size=20),
-                                #                     ],
-                                #                     alignment=ft.MainAxisAlignment.END,
-                                #                 ) for item, price in hesburger.menu.items()
-                                #             ],
-                                #             alignment=ft.MainAxisAlignment.END,
-                                #         ),
-                                #         total_quantity_text,
-                                #         total_price_text,
-                                #     ],
-                                #     alignment=ft.MainAxisAlignment.CENTER,
-                                # ),
-                                ft.ElevatedButton("Go to basket", on_click=lambda _: page.go("/basket")),
-                            ],
-                            alignment=ft.MainAxisAlignment.CENTER,
-                        ),
-                    ],
+                    "Hesburger",
+                    "https://raw.githubusercontent.com/nereasalamero/UIProgramming/main/project_foodApp/assets/hesburger.png",
+                    hesburger.type_of_food,
+                    hesburger.location,
+                    hes.total_quantity_text,
+                    hes.total_price_text,
+                    hes.menu_controls,
+                    hesburger.rating,
                 )
             )
         if page.route == "/subway":
             page.views.append(
-                ft.View(
+                restaurant_page(
+                    page,
                     "/subway",
-                    [
-                        ft.AppBar(
-                            leading=leading_avatar,
-                            leading_width=40,
-                            bgcolor=background_color,
-                            center_title=True,
-                            actions=[home, basket, profile],
-                        ),
-                        ft.Row(
-                            controls=[
-                                ft.Container(
-                                    content=ft.Image(src=" "),
-                                    width=150,
-                                    height=150,
-                                    border_radius=ft.border_radius.all(10),
-                                    bgcolor=ft.colors.WHITE,
-                                    padding=ft.padding.all(10),
-                                ),
-                                ft.Column(
-                                    controls=[
-                                        ft.Text("Subway", size=25, weight=ft.FontWeight.BOLD),
-                                        ft.Row(
-                                            controls=[
-                                                ft.Icon(name=ft.icons.STAR, color=ft.colors.AMBER_500, size=15),
-                                                ft.Icon(name=ft.icons.STAR, color=ft.colors.AMBER_500, size=15),
-                                                ft.Icon(name=ft.icons.STAR, color=ft.colors.AMBER_500, size=15),
-                                                ft.Icon(name=ft.icons.STAR, color=ft.colors.AMBER_500, size=15),
-                                                ft.Icon(name=ft.icons.STAR_BORDER, color=ft.colors.AMBER_500, size=15),
-                                            ],
-                                            alignment=ft.MainAxisAlignment.CENTER,
-                                        ),
-                                        ft.Text(subway.type_of_food, size=15),
-                                        ft.Text(subway.location, size=15),
-                                        sub.total_quantity_text,
-                                        sub.total_price_text
-                                    ],
-                                    alignment=ft.MainAxisAlignment.CENTER,
-                                ),
-                            ],
-                            alignment=ft.MainAxisAlignment.CENTER,
-                        ),
-                        ft.Divider(height=20),
-                        ft.Column(
-                            controls=[
-                                ft.Container(
-                                    content=
-                                    ft.Text("Menu"),
-                                    width=150,
-                                    height=50,
-                                    bgcolor=ft.colors.SURFACE_VARIANT,
-                                    padding=ft.padding.all(10),
-                                    alignment=ft.alignment.center,  # Ensure this is a valid alignment value
-                                    border_radius=ft.border_radius.all(10),
-                                ),
-                                ft.Container(
-                                    content=
-                                    ft.Column(
-                                        controls=sub.menu_controls,
-                                        alignment=ft.MainAxisAlignment.CENTER,
-                                    ),
-                                ), 
-                                ft.ElevatedButton("Go to basket", on_click=lambda _: page.go("/basket")),
-                            ],
-                            alignment=ft.MainAxisAlignment.CENTER,
-                        ),
-                    ],
+                    "Subway",
+                    "https://raw.githubusercontent.com/nereasalamero/UIProgramming/main/project_foodApp/assets/subway.png",
+                    subway.type_of_food,
+                    subway.location,
+                    sub.total_quantity_text,
+                    sub.total_price_text,
+                    sub.menu_controls,
+                    subway.rating,
                 )
             )
         if page.route == "/tacobell":
             page.views.append(
-                ft.View(
+                restaurant_page(
+                    page,
                     "/tacobell",
-                    [
-                        ft.AppBar(
-                            leading=leading_avatar,
-                            leading_width=40,
-                            bgcolor=background_color,
-                            center_title=True,
-                            actions=[home, basket, profile],
-                        ),
-                        ft.Row(
-                            controls=[
-                                ft.Container(
-                                    content=ft.Image(src=" "),
-                                    width=150,
-                                    height=150,
-                                    border_radius=ft.border_radius.all(10),
-                                    bgcolor=ft.colors.WHITE,
-                                    padding=ft.padding.all(10),
-                                ),
-                                ft.Column(
-                                    controls=[
-                                        ft.Text("Tacobell", size=25, weight=ft.FontWeight.BOLD),
-                                        ft.Row(
-                                            controls=[
-                                                ft.Icon(name=ft.icons.STAR, color=ft.colors.AMBER_500, size=15),
-                                                ft.Icon(name=ft.icons.STAR, color=ft.colors.AMBER_500, size=15),
-                                                ft.Icon(name=ft.icons.STAR, color=ft.colors.AMBER_500, size=15),
-                                                ft.Icon(name=ft.icons.STAR, color=ft.colors.AMBER_500, size=15),
-                                                ft.Icon(name=ft.icons.STAR, color=ft.colors.AMBER_500, size=15),
-                                            ],
-                                            alignment=ft.MainAxisAlignment.CENTER,
-                                        ),
-                                        ft.Text("Tacos, Burritos, Fast Food", size=15),
-                                        ft.Text(tacobell.location, size=15),
-                                        tb.total_quantity_text,
-                                        tb.total_price_text
-                                    ],
-                                    alignment=ft.MainAxisAlignment.CENTER,
-                                ),
-                            ],
-                            alignment=ft.MainAxisAlignment.CENTER,
-                        ),
-                        ft.Divider(height=20),
-                        ft.Column(
-                            controls=[
-                                ft.Container(
-                                    content=
-                                    ft.Text("Menu"),
-                                    width=150,
-                                    height=50,
-                                    bgcolor=ft.colors.SURFACE_VARIANT,
-                                    padding=ft.padding.all(10),
-                                    alignment=ft.alignment.center,  # Ensure this is a valid alignment value
-                                    border_radius=ft.border_radius.all(10),
-                                ),
-                                ft.Container(
-                                    content=
-                                    ft.Column(
-                                        controls=tb.menu_controls,
-                                        alignment=ft.MainAxisAlignment.CENTER,
-                                    ),
-                                ), 
-                                ft.ElevatedButton("Go to basket", on_click=lambda _: page.go("/basket")),
-                            ],
-                            alignment=ft.MainAxisAlignment.CENTER,
-                        ),
-                    ],
+                    "Tacobell",
+                    "https://raw.githubusercontent.com/nereasalamero/UIProgramming/main/project_foodApp/assets/tacobell.png",
+                    tacobell.type_of_food,
+                    tacobell.location,
+                    tb.total_quantity_text,
+                    tb.total_price_text,
+                    tb.menu_controls,
+                    tacobell.rating,
                 )
             )
         page.update()
