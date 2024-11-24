@@ -1,5 +1,5 @@
 ## Group project: Food App
-**Authors:** `Etling, Niklas` `Goasduf, Katia` `Marchenko, Arsenii` `Noyrez, Thibault` `Salamero Labara, Nerea`
+**Authors:** `Etling, Niklas` `Goasduf, Katia` `Marchenko, Arsenii` `Noyrez, Thibault` `Salamero Labara, Nerea`<br>
 **Date:** `November 22nd, 2024` <br>
 **Summary:** Group project for User Interface Programming.
 
