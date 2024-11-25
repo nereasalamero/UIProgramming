@@ -19,15 +19,19 @@ class RestaurantApp:
         self.quantities = {item: 0 for item in self.restaurant.menu}
         self.menu_controls = []
         self.quantity_texts = {item: ft.Text(f"0") for item in self.restaurant.menu}
+        self.total_quantity = 0
+        self.total_price = 0
         self.total_quantity_text = ft.Text("Total Quantity: 0")
         self.total_price_text = ft.Text("Total Cost: $0.00")
+        self.basket_items = []
         self.page = page  # Store the page object for UI updates
 
+    
     def update_total(self):
-        total_quantity = sum(self.quantities.values())
-        total_price = sum(self.quantities[item] * price for item, price in self.restaurant.menu.items())
-        self.total_quantity_text.value = f"Total Quantity: {total_quantity}"
-        self.total_price_text.value = f"Total Price: ${total_price:.2f}"
+        self.total_quantity = sum(self.quantities.values())
+        self.total_price = sum(self.quantities[item] * price for item, price in self.restaurant.menu.items())
+        self.total_quantity_text.value = f"Total Quantity: {self.total_quantity}"
+        self.total_price_text.value = f"Total Price: ${self.total_price:.2f}"
         self.page.update()  # Update the UI
 
     def increment_quantity(self, item):
@@ -71,12 +75,6 @@ class RestaurantApp:
 def main(page: ft.Page):
     background_color='#E5FFC0'
     page.bgcolor = background_color
-    # Variables used in the app
-    icon = ft.Image(
-        src=f"/assets/icon.png",
-        width=30,
-        height=30,
-    )
 
     # Variables used in the authentication pages
     signup_username = ft.TextField(label="Username")
@@ -88,9 +86,9 @@ def main(page: ft.Page):
 
     # Variables used in the profile pages
     profile_name = ft.TextField(label="Name")
-    profile_email = ft.TextField(label="Email")
-    profile_phone = ft.TextField(label="Phone")
-    profile_address = ft.TextField(label="Address")
+    profile_email = ft.TextField(label="Email", keyboard_type=ft.KeyboardType.EMAIL)
+    profile_phone = ft.TextField(label="Phone", keyboard_type=ft.KeyboardType.PHONE)
+    profile_address = ft.TextField(label="Address", keyboard_type=ft.KeyboardType.STREET_ADDRESS)
     profile_username = ft.TextField(label="Username")
     profile_password = ft.TextField(label="Password", password=True, can_reveal_password=True)
     dark_mode = ft.Switch(label="Dark mode", value=False, on_change=lambda e: change_mode)
@@ -114,9 +112,9 @@ def main(page: ft.Page):
 
     # Data for the three restaurants
     restaurants = [
-    {"name": "Hesburger", "category": "Burger", "image": "https://raw.githubusercontent.com/nereasalamero/UIProgramming/main/project_foodApp/assets/hesburger.png", "page": "hesburger"},
-    {"name": "Subway", "category": "Sandwich", "image": "https://raw.githubusercontent.com/nereasalamero/UIProgramming/main/project_foodApp/assets/subway.png", "page": "subway"},
-    {"name": "Taco Bell", "category": "Tacos", "image": "https://raw.githubusercontent.com/nereasalamero/UIProgramming/main/project_foodApp/assets/tacobell.png", "page": "tacobell"},
+        {"name": "Hesburger", "category": "Burger", "image": "https://raw.githubusercontent.com/nereasalamero/UIProgramming/main/project_foodApp/assets/hesburger.png", "page": "hesburger"},
+        {"name": "Subway", "category": "Sandwich", "image": "https://raw.githubusercontent.com/nereasalamero/UIProgramming/main/project_foodApp/assets/subway.png", "page": "subway"},
+        {"name": "Taco Bell", "category": "Tacos", "image": "https://raw.githubusercontent.com/nereasalamero/UIProgramming/main/project_foodApp/assets/tacobell.png", "page": "tacobell"},
     ]
 
     # List showing the restaurants
@@ -160,6 +158,8 @@ def main(page: ft.Page):
     )
     tb = RestaurantApp(tacobell, page)
     tb.update_menu_controls()
+    basket_total_quantity = (hes.total_quantity + sub.total_quantity + tb.total_quantity)
+    basket_total_price = (hes.total_price + sub.total_price + tb.total_price)
 
     # Function to filter restaurants
     def filter_restaurants(category):
@@ -223,6 +223,7 @@ def main(page: ft.Page):
         signup_confirm_password.update()
         # If there isn't any problem, clear inputs and navigate to the homepage
         if not has_error:
+            profile_username.value = signup_username.value
             signup_username.value = ""
             signup_password.value = ""
             signup_confirm_password.value = ""
@@ -253,6 +254,7 @@ def main(page: ft.Page):
         signin_password.update()
 
         if not has_error:
+            profile_username.value = signin_username.value
             # Clear input fields before navigating
             signin_username.value = ""
             signin_password.value = ""
@@ -344,6 +346,78 @@ def main(page: ft.Page):
             stars.append(ft.Icon(name=ft.icons.STAR_BORDER, color=ft.colors.AMBER_500, size=15))
         return ft.Row(controls=stars, alignment=ft.MainAxisAlignment.CENTER)
 
+    # Function to show the basket page, including the items the user has added
+    def show_basket():
+        return ft.View(
+            "/basket",
+            [
+                ft.AppBar(
+                    leading=leading_avatar,
+                    leading_width=40,
+                    bgcolor=background_color,
+                    center_title=True,
+                    actions=[home, profile],
+                ),
+                ft.Row(
+                    controls=[
+                        ft.Container(
+                            content=ft.Text("Basket"),
+                            width=150,
+                            height=50,
+                            bgcolor=ft.colors.SURFACE_VARIANT,
+                            padding=ft.padding.all(10),
+                            alignment=ft.alignment.center,
+                            border_radius=ft.border_radius.all(10),
+                        ),
+                    ],  
+                    alignment=ft.MainAxisAlignment.CENTER,
+                ),
+                ft.Divider(height=20),
+                ft.Column(
+                    controls=[
+                        ft.Column(
+                            controls=[
+                                ft.Text("Hesburger", size=25),
+                                ft.Text(f"Quantity: {hes.total_quantity} items", size=15),
+                                ft.Text(f"Price: {hes.total_price:.2f} €", size=15),
+                                
+                                ft.Text("Subway", size=25),
+                                ft.Text(f"Quantity: {sub.total_quantity} items", size=15),
+                                ft.Text(f"Price: {sub.total_price:.2f} €", size=15),
+    
+                                ft.Text("Taco Bell", size=25),
+                                ft.Text(f"Quantity: {tb.total_quantity} items", size=15),
+                                ft.Text(f"Price: {tb.total_price:.2f} €", size=15),
+                            ],
+                            alignment=ft.MainAxisAlignment.START,
+                        ),
+                        ft.Divider(height=10),
+                        ft.Row(
+                            controls=[
+                                ft.Text("Total", size=15),
+                                ft.Text(f"{basket_total_quantity} items", size=15),
+                                ft.Text(f"{basket_total_price:.2f} €", size=15),
+                            ],
+                            alignment=ft.MainAxisAlignment.END,
+                        ),
+                        ft.Divider(height=10),
+                        ft.ElevatedButton("Delete order", on_click=lambda _: delete_order),
+                    ],
+                    alignment=ft.MainAxisAlignment.CENTER,
+                ),
+            ],
+        )
+
+    
+    
+    # Function to delete the order
+    def delete_order():
+        hes.delete_order()
+        sub.delete_order()
+        tb.delete_order()
+        page.update()
+        page.go("/homepage")
+    
     # Function to change the navigation route
     def route_change(route):
         page.views.clear()
@@ -352,19 +426,24 @@ def main(page: ft.Page):
                 "/",
                 [
                     ft.AppBar(title=ft.Text("Sign in"), bgcolor=background_color, center_title=True),
-                    ft.Column(controls=[icon], alignment=ft.MainAxisAlignment.CENTER),
                     ft.Container(
-                        content=ft.Column(
-                            controls=[
-                                signin_username,
-                                signin_password,
-                                ft.ElevatedButton("Sign in", on_click=signin_validate),
-                                ft.ElevatedButton("I don't have an account", on_click=lambda _: page.go("/signup")),
-                            ],
-                            alignment=ft.MainAxisAlignment.START, 
-                            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                        ),
-                        expand=True,
+                        content=
+                            ft.Column(
+                                controls=[
+                                    ft.Image(
+                                        src="https://raw.githubusercontent.com/nereasalamero/UIProgramming/main/project_foodApp/assets/icon.png",
+                                        width=250,
+                                        height=250,
+                                    ),
+                                    ft.Text("Welcome to GustoGo!", size=20),
+                                    signin_username,
+                                    signin_password,
+                                    ft.ElevatedButton("Sign in", on_click=signin_validate),
+                                    ft.ElevatedButton("I don't have an account", on_click=lambda _: page.go("/signup")),
+                                ], 
+                                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                            ),
+                            expand=True,
                     ),
                 ],
             )
@@ -376,17 +455,21 @@ def main(page: ft.Page):
                     "/signup",
                     [
                         ft.AppBar(title=ft.Text("Sign up"), bgcolor=background_color, center_title=True),
-                        ft.Column(controls=[icon], alignment=ft.MainAxisAlignment.CENTER),
                         ft.Container(
                             content=ft.Column(
                                 controls=[
+                                    ft.Image(
+                                        src="https://raw.githubusercontent.com/nereasalamero/UIProgramming/main/project_foodApp/assets/icon.png",
+                                        width=250,
+                                        height=250,
+                                    ),
+                                    ft.Text("Welcome to GustoGo!", size=20),
                                     signup_username,
                                     signup_password,
                                     signup_confirm_password,
                                     ft.ElevatedButton("Sign up", on_click=signup_validate),
                                     ft.ElevatedButton("I already have an account", on_click=lambda _: page.go("/")),
                                 ],
-                                alignment=ft.MainAxisAlignment.START, 
                                 horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                             ),
                             expand=True,
@@ -394,6 +477,7 @@ def main(page: ft.Page):
                     ],
                 )
             ),
+
         if page.route == "/homepage":
             page.views.append(
                 ft.View(
@@ -424,27 +508,12 @@ def main(page: ft.Page):
             )
             # Show all restaurants by default
             filter_restaurants("All")
+
         if page.route == "/basket":
             page.views.append(
-            ft.View(
-                "/basket",
-                [
-                    ft.AppBar(
-                        leading=leading_avatar,
-                        leading_width=40,
-                        title=ft.Text("Basket"),
-                        bgcolor=background_color,
-                        center_title=True,
-                        actions=[home, profile],
-                    ),
-                    ft.Container(
-                        content=ft.Text("This is the basket page", size=20),
-                        expand=True,
-                        alignment=ft.alignment.center,
-                    ),
-                ],
+                show_basket()
             )
-        )
+
         if page.route == "/profile":
             page.views.append(
                 ft.View(
@@ -461,8 +530,7 @@ def main(page: ft.Page):
                         ft.Container(
                             content=ft.Column(  
                                 controls=[
-                                    ft.Text("This is my profile page", size=20),
-                                    ft.Text(f"Username: {profile_username.value}", size=15),
+                                    ft.Text(f"Welcome, {profile_username.value}", size=20),
                                     ft.Text(f"Name: {profile_name.value}", size=15),
                                     ft.Text(f"Email: {profile_email.value}", size=15),
                                     ft.Text(f"Phone: {profile_phone.value}", size=15),
@@ -495,7 +563,6 @@ def main(page: ft.Page):
                             content=ft.Column(
                                 controls=[
                                     ft.Text("This is my profile page", size=20),
-                                    profile_username,
                                     profile_name,
                                     profile_email,
                                     profile_phone,
