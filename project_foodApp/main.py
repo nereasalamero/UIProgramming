@@ -73,7 +73,8 @@ class RestaurantApp:
 
 # This is the main function that will be executed when the app starts
 def main(page: ft.Page):
-    background_color='#E5FFC0'
+    global background_color
+    background_color = '#E5FFC0'
     page.bgcolor = background_color
 
     # Variables used in the authentication pages
@@ -91,7 +92,6 @@ def main(page: ft.Page):
     profile_address = ft.TextField(label="Address", keyboard_type=ft.KeyboardType.STREET_ADDRESS)
     profile_username = ft.TextField(label="Username")
     profile_password = ft.TextField(label="Password", password=True, can_reveal_password=True)
-    dark_mode = ft.Switch(label="Dark mode", value=False, on_change=lambda e: change_mode)
     
     def change_mode(e):
         if dark_mode.value:
@@ -99,6 +99,7 @@ def main(page: ft.Page):
         else:
             page.bgcolor = background_color
         page.update()
+    dark_mode = ft.Switch(label="Dark mode", value=False, on_change=lambda e: change_mode)
 
     # Variables for the homepage
     basket = ft.IconButton(ft.icons.SHOPPING_BASKET, on_click=lambda _: page.go("/basket"))
@@ -115,12 +116,15 @@ def main(page: ft.Page):
         {"name": "Hesburger", "category": "Burger", "image": "https://raw.githubusercontent.com/nereasalamero/UIProgramming/main/project_foodApp/assets/hesburger.png", "page": "hesburger"},
         {"name": "Subway", "category": "Sandwich", "image": "https://raw.githubusercontent.com/nereasalamero/UIProgramming/main/project_foodApp/assets/subway.png", "page": "subway"},
         {"name": "Taco Bell", "category": "Tacos", "image": "https://raw.githubusercontent.com/nereasalamero/UIProgramming/main/project_foodApp/assets/tacobell.png", "page": "tacobell"},
+        {"name": "McDonalds", "category": "Burger", "image": "https://raw.githubusercontent.com/nereasalamero/UIProgramming/main/project_foodApp/assets/mcdonalds.png", "page": "mcdonalds"},
+        {"name": "Pizza Hut", "category": "Pizza", "image": "https://raw.githubusercontent.com/nereasalamero/UIProgramming/main/project_foodApp/assets/pizzahut.png", "page": "pizzahut"},
     ]
 
     # List showing the restaurants
-    restaurant_list = ft.Column(spacing=10)
+    restaurant_list = ft.Column(spacing=10, scroll=True)
 
-     # Variables used in the restaurant page
+    # Variables used in the restaurant page
+    # Create a Hesburger restaurant
     hesburger = Restaurant(
         type_of_food="Burgers, Fast Food",
         menu={
@@ -133,6 +137,7 @@ def main(page: ft.Page):
     hes = RestaurantApp(hesburger, page)
     hes.update_menu_controls()
 
+    # Create a Subway restaurant
     subway = Restaurant(
         type_of_food="Subs, Fast Food",
         menu={
@@ -145,6 +150,7 @@ def main(page: ft.Page):
     sub = RestaurantApp(subway, page)
     sub.update_menu_controls()
 
+    # Create a Taco Bell restaurant
     tacobell = Restaurant(
         type_of_food="Tacos, Burritos, Fast Food",
         menu={
@@ -158,9 +164,37 @@ def main(page: ft.Page):
     )
     tb = RestaurantApp(tacobell, page)
     tb.update_menu_controls()
+
+    # Create a McDonalds restaurant
+    mcdonalds = Restaurant(
+        type_of_food="Fast Food",
+        menu={
+            "Big Mac": 5,
+            "10 Piece": 4,
+            "Mcflurry": 3
+        },
+        location="Kuopio",
+        rating = 4.5
+    )
+    mc = RestaurantApp(mcdonalds, page)
+    mc.update_menu_controls()
+
+    # Create a Pizza Hut restaurant
+    pizzahut = Restaurant(
+        type_of_food="Pizza, Fast Food",
+        menu={
+            "Pepperoni": 5,
+            "Hawaiian": 6,
+            "Margherita": 3
+        },
+        location="Kuopio",
+        rating=4
+    )
+    ph = RestaurantApp(pizzahut, page)
+    ph.update_menu_controls()
+    
     # Function to filter restaurants
     def filter_restaurants(category):
-        
         if category == "All":
             filtered_restaurants = restaurants
         else:
@@ -485,6 +519,7 @@ def main(page: ft.Page):
                                 ft.ElevatedButton("Burger", on_click=lambda _: filter_restaurants("Burger")),
                                 ft.ElevatedButton("Sandwich", on_click=lambda _: filter_restaurants("Sandwich")),
                                 ft.ElevatedButton("Tacos", on_click=lambda _: filter_restaurants("Tacos")),
+                                ft.ElevatedButton("Pizza", on_click=lambda _: filter_restaurants("Pizza")),
                             ],
                             alignment=ft.MainAxisAlignment.CENTER,
                         ),
@@ -553,7 +588,23 @@ def main(page: ft.Page):
                                     ft.Text("This is my profile page", size=20),
                                     profile_name,
                                     profile_email,
-                                    profile_phone,
+                                    ft.Row(
+                                        controls=[
+                                            ft.Dropdown(
+                                                label="Country",
+                                                options=[
+                                                    ft.dropdown.Option("(FI) +358"),
+                                                    ft.dropdown.Option("(FR) +33"),
+                                                    ft.dropdown.Option("(SP) +34"),
+                                                    ft.dropdown.Option("(UK) +44"),                                                
+                                                ],
+                                                on_change=lambda e: print(e),
+                                                width=200,
+                                            ),
+                                            profile_phone,
+                                        ],
+                                        alignment=ft.MainAxisAlignment.START,
+                                    ),
                                     profile_address,
                                     profile_password,
                                     dark_mode,
@@ -610,6 +661,36 @@ def main(page: ft.Page):
                     tb.total_price_text,
                     tb.menu_controls,
                     tacobell.rating,
+                )
+            )
+        if page.route == "/mcdonalds":
+            page.views.append(
+                restaurant_page(
+                    page,
+                    "/mcdonalds",
+                    "McDonalds",
+                    "https://raw.githubusercontent.com/nereasalamero/UIProgramming/main/project_foodApp/assets/mcdonalds.png",
+                    mcdonalds.type_of_food,
+                    mcdonalds.location,
+                    mc.total_quantity_text,
+                    mc.total_price_text,
+                    mc.menu_controls,
+                    mcdonalds.rating,
+                )
+            )
+        if page.route == "/pizzahut":
+            page.views.append(
+                restaurant_page(
+                    page,
+                    "/pizzahut",
+                    "Pizza Hut",
+                    "https://raw.githubusercontent.com/nereasalamero/UIProgramming/main/project_foodApp/assets/pizzahut.png",
+                    pizzahut.type_of_food,
+                    pizzahut.location,
+                    ph.total_quantity_text,
+                    ph.total_price_text,
+                    ph.menu_controls,
+                    pizzahut.rating,
                 )
             )
         page.update()
