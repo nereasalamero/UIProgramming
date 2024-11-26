@@ -158,11 +158,9 @@ def main(page: ft.Page):
     )
     tb = RestaurantApp(tacobell, page)
     tb.update_menu_controls()
-    basket_total_quantity = (hes.total_quantity + sub.total_quantity + tb.total_quantity)
-    basket_total_price = (hes.total_price + sub.total_price + tb.total_price)
-
     # Function to filter restaurants
     def filter_restaurants(category):
+        
         if category == "All":
             filtered_restaurants = restaurants
         else:
@@ -353,6 +351,8 @@ def main(page: ft.Page):
 
     # Function to show the basket page, including the items the user has added
     def show_basket():
+        basket_total_quantity = (hes.total_quantity + sub.total_quantity + tb.total_quantity)
+        basket_total_price = (hes.total_price + sub.total_price + tb.total_price)
         return ft.View(
             "/basket",
             [
