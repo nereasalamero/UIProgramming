@@ -21,8 +21,8 @@ class RestaurantApp:
         self.quantity_texts = {item: ft.Text(f"0") for item in self.restaurant.menu}
         self.total_quantity = 0
         self.total_price = 0
-        self.total_quantity_text = ft.Text("Total Quantity: 0")
-        self.total_price_text = ft.Text("Total Cost: $0.00")
+        self.total_quantity_text = ft.Text(f"Total Quantity: {self.total_quantity}")
+        self.total_price_text = ft.Text(f"Total Cost: {self.total_price:.2f} €")
         self.basket_items = []
         self.page = page  # Store the page object for UI updates
 
@@ -31,7 +31,7 @@ class RestaurantApp:
         self.total_quantity = sum(self.quantities.values())
         self.total_price = sum(self.quantities[item] * price for item, price in self.restaurant.menu.items())
         self.total_quantity_text.value = f"Total Quantity: {self.total_quantity}"
-        self.total_price_text.value = f"Total Price: ${self.total_price:.2f}"
+        self.total_price_text.value = f"Total Price: {self.total_price:.2f} €"
         self.page.update()  # Update the UI
 
     def increment_quantity(self, item):
@@ -53,7 +53,7 @@ class RestaurantApp:
             self.menu_controls.append(
                 ft.Row(
                     controls=[
-                        ft.Text(f"{item} - ${price:.2f}"),
+                        ft.Text(f"{item} - {price:.2f} €"),
                         ft.IconButton(ft.icons.REMOVE, on_click=lambda e, item=item: self.decrement_quantity(item)),
                         self.quantity_texts[item],
                         ft.IconButton(ft.icons.ADD, on_click=lambda e, item=item: self.increment_quantity(item)),
@@ -180,18 +180,20 @@ def main(page: ft.Page):
             content=ft.Column(
                 controls=[
                     ft.Image(src=image_url, width=page.width, height=100, fit=ft.ImageFit.COVER, expand=True),  # Image here
-                    ft.Text(name, color=ft.colors.BLACK, size=20, weight=ft.FontWeight.BOLD),  # Text below
+                    ft.Text(name, color=ft.colors.BLACK, size=20, weight=ft.FontWeight.BOLD, text_align=ft.TextAlign.CENTER),                   # Text below
                 ],
                 alignment=ft.MainAxisAlignment.CENTER,
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                 expand=True,
             ),
             expand=True,
-            bgcolor=background_color,
             padding=20,
+            bgcolor=ft.colors.GREY_200,
             border_radius=10,
             on_click=lambda _: page.go(f"/{link}"),  # Change to restaurant type or ID
         )
+
+
 
     # Function to validate the sign-up form
     def signup_validate(e):
@@ -318,6 +320,7 @@ def main(page: ft.Page):
                             content=ft.Column(
                                 controls=menu_controls,
                                 alignment=ft.MainAxisAlignment.CENTER,
+                                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                             ),
                         ),
                         ft.Row(
@@ -328,7 +331,9 @@ def main(page: ft.Page):
                             alignment=ft.MainAxisAlignment.CENTER,
                         )
                     ],
-                    alignment=ft.MainAxisAlignment.CENTER,
+                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                    expand=True,
+
                 ),
             ],
         )
@@ -352,27 +357,13 @@ def main(page: ft.Page):
             "/basket",
             [
                 ft.AppBar(
+                    title=ft.Text("Basket"),
                     leading=leading_avatar,
                     leading_width=40,
                     bgcolor=background_color,
                     center_title=True,
                     actions=[home, profile],
                 ),
-                ft.Row(
-                    controls=[
-                        ft.Container(
-                            content=ft.Text("Basket"),
-                            width=150,
-                            height=50,
-                            bgcolor=ft.colors.SURFACE_VARIANT,
-                            padding=ft.padding.all(10),
-                            alignment=ft.alignment.center,
-                            border_radius=ft.border_radius.all(10),
-                        ),
-                    ],  
-                    alignment=ft.MainAxisAlignment.CENTER,
-                ),
-                ft.Divider(height=20),
                 ft.Column(
                     controls=[
                         ft.Column(
@@ -380,14 +371,17 @@ def main(page: ft.Page):
                                 ft.Text("Hesburger", size=25),
                                 ft.Text(f"Quantity: {hes.total_quantity} items", size=15),
                                 ft.Text(f"Price: {hes.total_price:.2f} €", size=15),
-                                
+                                ft.ElevatedButton("Delete order", on_click=lambda _: delete_order(hes)),
+
                                 ft.Text("Subway", size=25),
                                 ft.Text(f"Quantity: {sub.total_quantity} items", size=15),
                                 ft.Text(f"Price: {sub.total_price:.2f} €", size=15),
-    
+                                ft.ElevatedButton("Delete order", on_click=lambda _: delete_order(sub)),
+
                                 ft.Text("Taco Bell", size=25),
                                 ft.Text(f"Quantity: {tb.total_quantity} items", size=15),
                                 ft.Text(f"Price: {tb.total_price:.2f} €", size=15),
+                                ft.ElevatedButton("Delete order", on_click=lambda _: delete_order(tb)),
                             ],
                             alignment=ft.MainAxisAlignment.START,
                         ),
@@ -401,22 +395,16 @@ def main(page: ft.Page):
                             alignment=ft.MainAxisAlignment.END,
                         ),
                         ft.Divider(height=10),
-                        ft.ElevatedButton("Delete order", on_click=lambda _: delete_order),
                     ],
                     alignment=ft.MainAxisAlignment.CENTER,
                 ),
             ],
         )
-
-    
     
     # Function to delete the order
-    def delete_order():
-        hes.delete_order()
-        sub.delete_order()
-        tb.delete_order()
+    def delete_order(restaurant):
+        restaurant.delete_order()
         page.update()
-        page.go("/homepage")
     
     # Function to change the navigation route
     def route_change(route):
