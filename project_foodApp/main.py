@@ -73,7 +73,6 @@ class RestaurantApp:
 
 # This is the main function that will be executed when the app starts
 def main(page: ft.Page):
-    global background_color
     background_color = '#E5FFC0'
     page.bgcolor = background_color
 
@@ -92,14 +91,20 @@ def main(page: ft.Page):
     profile_address = ft.TextField(label="Address", keyboard_type=ft.KeyboardType.STREET_ADDRESS)
     profile_username = ft.TextField(label="Username")
     profile_password = ft.TextField(label="Password", password=True, can_reveal_password=True)
-    
-    def change_mode(e):
-        if dark_mode.value:
-            page.bgcolor = ft.colors.BLACK
-        else:
-            page.bgcolor = background_color
+
+    def theme_changed(e):
+        page.theme_mode = (
+            ft.ThemeMode.DARK
+            if page.theme_mode == ft.ThemeMode.LIGHT
+            else ft.ThemeMode.LIGHT
+        )
+        profile_theme.label = (
+            "Light theme" if page.theme_mode == ft.ThemeMode.LIGHT else "Dark theme"
+        )
         page.update()
-    dark_mode = ft.Switch(label="Dark mode", value=False, on_change=lambda e: change_mode)
+
+    page.theme_mode = ft.ThemeMode.LIGHT
+    profile_theme = ft.Switch(label="Light theme", on_change=theme_changed)
 
     # Variables for the homepage
     basket = ft.IconButton(ft.icons.SHOPPING_BASKET, on_click=lambda _: page.go("/basket"))
@@ -224,8 +229,6 @@ def main(page: ft.Page):
             border_radius=10,
             on_click=lambda _: page.go(f"/{link}"),  # Change to restaurant type or ID
         )
-
-
 
     # Function to validate the sign-up form
     def signup_validate(e):
@@ -387,6 +390,7 @@ def main(page: ft.Page):
     def show_basket():
         basket_total_quantity = (hes.total_quantity + sub.total_quantity + tb.total_quantity)
         basket_total_price = (hes.total_price + sub.total_price + tb.total_price)
+
         return ft.View(
             "/basket",
             [
@@ -402,22 +406,108 @@ def main(page: ft.Page):
                     controls=[
                         ft.Column(
                             controls=[
-                                ft.Text("Hesburger", size=25),
-                                ft.Text(f"Quantity: {hes.total_quantity} items", size=15),
-                                ft.Text(f"Price: {hes.total_price:.2f} €", size=15),
-                                ft.ElevatedButton("Delete order", on_click=lambda _: delete_order(hes)),
+                               ft.Container(
+                                   content=ft.Row(
+                                       controls=[
+                                           ft.Text("Hesburger", size=25, width=200),
+                                           ft.Column(
+                                               controls=[
+                                                   ft.Text(f"Quantity: {hes.total_quantity} items", size=15),
+                                                    ft.Text(f"Price: {hes.total_price:.2f} €", size=15),
+                                                ],
+                                                alignment=ft.MainAxisAlignment.START,
+                                                width=400,
+                                            ),
+                                            ft.ElevatedButton("Delete order", on_click=lambda _: delete_order(hes)),
+                                        ],
+                                    ),
+                                    padding=10,  # Add padding inside the container
+                                    margin=ft.margin.only(bottom=15),  # Add space below the section
+                                    border_radius=ft.border_radius.all(8),  # Optional: Rounded corners
+                                ),
 
-                                ft.Text("Subway", size=25),
-                                ft.Text(f"Quantity: {sub.total_quantity} items", size=15),
-                                ft.Text(f"Price: {sub.total_price:.2f} €", size=15),
-                                ft.ElevatedButton("Delete order", on_click=lambda _: delete_order(sub)),
+                                ft.Container(
+                                    content=ft.Row(
+                                        controls=[
+                                            ft.Text("Subway", size=25, width=200),
+                                            ft.Column(
+                                                controls=[
+                                                    ft.Text(f"Quantity: {sub.total_quantity} items", size=15),
+                                                    ft.Text(f"Price: {sub.total_price:.2f} €", size=15),
+                                                ],
+                                                alignment=ft.MainAxisAlignment.START,
+                                                width=400,
+                                            ),
+                                            ft.ElevatedButton("Delete order", on_click=lambda _: delete_order(sub)),
+                                        ],
+                                    ),
+                                    padding=10,
+                                    margin=ft.margin.only(bottom=15),
+                                    border_radius=ft.border_radius.all(8),
+                                ),
 
-                                ft.Text("Taco Bell", size=25),
-                                ft.Text(f"Quantity: {tb.total_quantity} items", size=15),
-                                ft.Text(f"Price: {tb.total_price:.2f} €", size=15),
-                                ft.ElevatedButton("Delete order", on_click=lambda _: delete_order(tb)),
+                                ft.Container(
+                                    content=ft.Row(
+                                        controls=[
+                                            ft.Text("Taco Bell", size=25, width=200),
+                                            ft.Column(
+                                                controls=[
+                                                    ft.Text(f"Quantity: {tb.total_quantity} items", size=15),
+                                                    ft.Text(f"Price: {tb.total_price:.2f} €", size=15),
+                                                ],
+                                                alignment=ft.MainAxisAlignment.START,
+                                                width=400,
+                                            ),
+                                            ft.ElevatedButton("Delete order", on_click=lambda _: delete_order(tb)),
+                                        ],
+                                    ),
+                                    padding=10,
+                                    margin=ft.margin.only(bottom=15),
+                                    border_radius=ft.border_radius.all(8),
+                                ),
+
+                                ft.Container(
+                                    content=ft.Row(
+                                        controls=[
+                                            ft.Text("McDonalds", size=25, width=200),
+                                            ft.Column(
+                                                controls=[
+                                                    ft.Text(f"Quantity: {mc.total_quantity} items", size=15),
+                                                    ft.Text(f"Price: {mc.total_price:.2f} €", size=15),
+                                                ],
+                                                alignment=ft.MainAxisAlignment.START,
+                                                width=400,
+                                            ),
+                                            ft.ElevatedButton("Delete order", on_click=lambda _: delete_order(mc)),
+                                        ],
+                                    ),
+                                    padding=10,
+                                    margin=ft.margin.only(bottom=15),
+                                    border_radius=ft.border_radius.all(8),
+                                ),
+
+                                ft.Container(
+                                    content=ft.Row(
+                                        controls=[
+                                            ft.Text("Pizza Hut", size=25, width=200),
+                                            ft.Column(
+                                                controls=[
+                                                    ft.Text(f"Quantity: {ph.total_quantity} items", size=15),
+                                                    ft.Text(f"Price: {ph.total_price:.2f} €", size=15),
+                                                ],
+                                                alignment=ft.MainAxisAlignment.START,
+                                                width=400,
+                                            ),
+                                            ft.ElevatedButton("Delete order", on_click=lambda _: delete_order(ph)),
+                                        ],
+                                    ),
+                                    padding=10,
+                                    margin=ft.margin.only(bottom=15),
+                                    border_radius=ft.border_radius.all(8),
+                                ),
                             ],
                             alignment=ft.MainAxisAlignment.START,
+                            scroll=True,
                         ),
                         ft.Divider(height=10),
                         ft.Row(
@@ -431,9 +521,11 @@ def main(page: ft.Page):
                         ft.Divider(height=10),
                     ],
                     alignment=ft.MainAxisAlignment.CENTER,
+                    scroll=True,
                 ),
             ],
         )
+
     
     # Function to delete the order
     def delete_order(restaurant):
@@ -524,7 +616,7 @@ def main(page: ft.Page):
                             alignment=ft.MainAxisAlignment.CENTER,
                         ),
                         ft.Container(
-                            content=restaurant_list, expand=True, alignment=ft.alignment.center,
+                            content=restaurant_list, expand=True,
                         ),
                     ],
                 )
@@ -551,19 +643,26 @@ def main(page: ft.Page):
                             actions=[home, basket],
                         ),
                         ft.Container(
-                            content=ft.Column(  
-                                controls=[
-                                    ft.Text(f"Welcome, {profile_username.value}", size=20),
-                                    ft.Text(f"Name: {profile_name.value}", size=15),
-                                    ft.Text(f"Email: {profile_email.value}", size=15),
-                                    ft.Text(f"Phone: {profile_phone.value}", size=15),
-                                    ft.Text(f"Address: {profile_address.value}", size=15),
-                                    ft.Text(f"Dark mode: {dark_mode.value}", size=15),
-                                    ft.ElevatedButton("Edit profile", on_click=lambda _: page.go("/editprofile")),
-                                ],
-                                alignment=ft.MainAxisAlignment.CENTER, 
-                                horizontal_alignment=ft.CrossAxisAlignment.START,
-                            ),
+                            content=ft.Row([
+                                ft.Image(
+                                    src="https://raw.githubusercontent.com/nereasalamero/UIProgramming/main/project_foodApp/assets/profilepic.png",
+                                    width=250,
+                                    height=250,
+                                ),
+                                ft.Column(  
+                                    controls=[
+                                        ft.Text(f"Welcome, {profile_username.value}", size=20),
+                                        ft.Text(f"Name: {profile_name.value}", size=15),
+                                        ft.Text(f"Email: {profile_email.value}", size=15),
+                                        ft.Text(f"Phone: {profile_phone.value}", size=15),
+                                        ft.Text(f"Address: {profile_address.value}", size=15),
+                                        ft.Text(f"Dark mode: {profile_theme.value}", size=15),
+                                        ft.ElevatedButton("Edit profile", on_click=lambda _: page.go("/editprofile")),
+                                    ],
+                                    alignment=ft.MainAxisAlignment.CENTER, 
+                                    horizontal_alignment=ft.CrossAxisAlignment.START,
+                                ),
+                            ],),
                             expand=True,
                         ),
                     ],
@@ -607,7 +706,7 @@ def main(page: ft.Page):
                                     ),
                                     profile_address,
                                     profile_password,
-                                    dark_mode,
+                                    profile_theme,
                                     ft.ElevatedButton("Save changes", on_click=lambda _: page.go("/profile")),
                                 ],
                                 alignment=ft.MainAxisAlignment.CENTER, 
