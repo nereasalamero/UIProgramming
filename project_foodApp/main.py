@@ -540,6 +540,9 @@ def main(page: ft.Page):
     # Function to delete the order
     def delete_order_res(restaurant: RestaurantApp):
         restaurant.delete_order()
+
+        # Re-render the basket page
+        page.views[-1] = show_basket()  # Replace the current view with the updated basket
         page.update()
     
     # Function to change the navigation route
