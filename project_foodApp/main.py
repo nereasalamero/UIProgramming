@@ -7,9 +7,8 @@ class Restaurant:
         if rating < 0 or rating > 5:
             raise ValueError("Rating must be between 0 and 5")
         self.type_of_food = type_of_food
-        self.menu = menu  # menu should be a dictionary with the food as the key and the price as the value
-        self.location = location # location is a string that indicates where certain restaurant is located
-        # user could select through autoselect
+        self.menu = menu            # menu should be a dictionary with the food as the key and the price as the value
+        self.location = location    # location is a string that indicates where certain restaurant is located
         self.rating = rating
 
 # Create a class that will be used to manage the restaurant app
@@ -26,7 +25,7 @@ class RestaurantApp:
         self.basket_items = []
         self.page = page  # Store the page object for UI updates
 
-    
+    # Function to update the total quantity and price
     def update_total(self):
         self.total_quantity = sum(self.quantities.values())
         self.total_price = sum(self.quantities[item] * price for item, price in self.restaurant.menu.items())
@@ -34,12 +33,14 @@ class RestaurantApp:
         self.total_price_text.value = f"Total Price: {self.total_price:.2f} €"
         self.page.update()  # Update the UI
 
+    # Function to increment the quantity of an item
     def increment_quantity(self, item):
         self.quantities[item] += 1
         self.quantity_texts[item].value = str(self.quantities[item])
         self.update_total()
         self.page.update()
 
+    # Function to decrement the quantity of an item
     def decrement_quantity(self, item):
         if self.quantities[item] > 0:
             self.quantities[item] -= 1
@@ -47,6 +48,7 @@ class RestaurantApp:
             self.update_total()
             self.page.update()
 
+    # Function to update the menu controls
     def update_menu_controls(self):
         self.menu_controls.clear()
         for item, price in self.restaurant.menu.items():
@@ -63,18 +65,15 @@ class RestaurantApp:
                 )
             )
         self.page.update()  # Update the UI
+
+    # Function to delete the order
     def delete_order(self):
-        # self.quantities = {item: 0 for item in self.restaurant.menu}
-        # self.quantity_texts = {item: ft.Text(f"0") for item in self.restaurant.menu}
-        # self.update_total()
-        # self.menu_controls.clear()
-        # self.update_menu_controls()
-        # self.page.update()
         self.quantities = {item: 0 for item in self.restaurant.menu}
         for item in self.restaurant.menu:
             self.quantity_texts[item].value = "0"
         self.update_total()
         self.page.update()
+
 
 # This is the main function that will be executed when the app starts
 def main(page: ft.Page):
@@ -97,6 +96,7 @@ def main(page: ft.Page):
     profile_username = ft.TextField(label="Username")
     profile_password = ft.TextField(label="Password", password=True, can_reveal_password=True)
 
+    # Function to change the theme
     def theme_changed(e):
         page.theme_mode = (
             ft.ThemeMode.DARK
@@ -107,7 +107,6 @@ def main(page: ft.Page):
             "Light theme" if page.theme_mode == ft.ThemeMode.LIGHT else "Dark theme"
         )
         page.update()
-
     page.theme_mode = ft.ThemeMode.LIGHT
     profile_theme = ft.Switch(label="Light theme", on_change=theme_changed)
 
@@ -202,6 +201,37 @@ def main(page: ft.Page):
     )
     ph = RestaurantApp(pizzahut, page)
     ph.update_menu_controls()
+
+    # Variables used in the basket page (functions used for placing an order)
+    def close_dlg(e):
+        alert_place_order.open = False
+        e.control.page.update()
+
+    def open_dlg(e):
+        e.control.page.overlay.append(dlg_confirm)
+        dlg_confirm.open = True
+        e.control.page.update()
+        
+    alert_place_order = ft.AlertDialog(
+        modal=True,
+        title=ft.Text("Please confirm"),
+        content=ft.Text("Do you really want to place your order?"),
+        actions=[
+            ft.TextButton("Yes", on_click=open_dlg),
+            ft.TextButton("No", on_click=close_dlg),
+        ],
+        actions_alignment=ft.MainAxisAlignment.END,
+        on_dismiss=lambda e: print("Modal dialog dismissed!"),
+    )
+    dlg_confirm = ft.AlertDialog(
+        title=ft.Text("Your order is on its way!"), on_dismiss=lambda e: print("Dialog dismissed!")
+    )
+    
+    # Function to place an order
+    def place_order(e):
+        e.control.page.overlay.append(alert_place_order)
+        alert_place_order.open = True
+        e.control.page.update()
     
     # Function to filter restaurants
     def filter_restaurants(category):
@@ -221,8 +251,8 @@ def main(page: ft.Page):
         return ft.Container(
             content=ft.Column(
                 controls=[
-                    ft.Image(src=image_url, width=page.width, height=100, fit=ft.ImageFit.COVER, expand=True),  # Image here
-                    ft.Text(name, color=ft.colors.BLACK, size=20, weight=ft.FontWeight.BOLD, text_align=ft.TextAlign.CENTER),                   # Text below
+                    ft.Image(src=image_url, width=page.width, height=100, fit=ft.ImageFit.COVER, expand=True),                     # Image here
+                    ft.Text(name, color=ft.colors.BLACK, size=20, weight=ft.FontWeight.BOLD, text_align=ft.TextAlign.CENTER),      # Text below
                 ],
                 alignment=ft.MainAxisAlignment.CENTER,
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER,
@@ -322,12 +352,8 @@ def main(page: ft.Page):
 
             # Navigate to the homepage
             page.go("/homepage")
-    
-    #Function to add a new restaurant page
-    def total_quantities():
-        basket_total_quantity = (hes.total_quantity + sub.total_quantity + tb.total_quantity)
-        basket_total_price = (hes.total_price + sub.total_price + tb.total_price)
-        
+
+    # Function to create the restaurant page    
     def restaurant_page(page, route, name, image_src, type_of_food, location, total_quantity_text, total_price_text, menu_controls, rating):
         return ft.View(
             route,
@@ -522,7 +548,8 @@ def main(page: ft.Page):
                     ft.Divider(height=10),
                     ft.Row(
                         controls=[
-                            ft.Text("Total", size=15),
+                            ft.ElevatedButton("Place order", on_click=lambda e: place_order(e)),
+                            ft.Text("Total:", size=15),
                             ft.Text(f"{basket_total_quantity} items", size=15),
                             ft.Text(f"{basket_total_price:.2f} €", size=15),
                         ],
@@ -535,12 +562,11 @@ def main(page: ft.Page):
                 ),
             ],
         )
+       
 
-    
     # Function to delete the order
     def delete_order_res(restaurant: RestaurantApp):
         restaurant.delete_order()
-
         # Re-render the basket page
         page.views[-1] = show_basket()  # Replace the current view with the updated basket
         page.update()
